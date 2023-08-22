@@ -1,0 +1,148 @@
+<script>
+//hide the Update button on users menu
+$(document).ready(function(){
+    //dataTables
+    $('.table').DataTable();
+    $('#btnUpdateUser').hide();
+    $('#btnCancel').hide();
+});
+//toast
+function showToast(){
+  var title = 'Loading...';
+  var duration = 500;
+  $.Toast.showToast({title: title,duration: duration, image: '../../images/loading.gif'});
+}
+function hideLoading(){
+  $.Toast.hideToast();
+}
+//view unevaluated employee PAR in new tab
+$('.view-par').on('click', function(e){
+  e.preventDefault();
+    var par_id = $(this).attr('value');
+    window.open('uneval_par.php?id=' + par_id, '_blank');
+})
+
+//view draft PAR new tab
+$('.draft-par').on('click', function(e){
+  e.preventDefault();
+    var par_id = $(this).attr('value');
+    window.open('draft_par.php?id=' + par_id, '_blank');
+})
+
+//view draft review PAR new tab
+$('.draft-review-par').on('click', function(e){
+  e.preventDefault();
+    var id = $(this).attr('value');
+    window.open('draft_eval_par.php?id=' + id, '_blank');
+})
+
+//view evaluated employee PAR in new tab
+$('.eval-par').on('click', function(e){
+  e.preventDefault();
+    var par_id = $(this).attr('value');
+
+    window.open('eval_par.php?id=' + par_id, '_blank');
+})
+//print employee PAR(REVIEWED PAR)
+$('.print-par').on('click', function(e){
+  e.preventDefault();
+    var id = $(this).attr('value');
+    var action = 2;
+    var myData = 'id=' + id + '&action=' + action;
+    window.open('../../print/form/printEvalPAR.php?' + myData, '_blank');
+})
+//print employee PAR(UNREVIEWED PAR)
+$('.print-uneval-par').on('click', function(e){
+  e.preventDefault();
+    var id = $(this).attr('value');
+    window.open('../../print/form/printUnEvalPAR.php?id='+id, '_blank');
+})
+//btnEdit event handler
+$('#btnEdit').on('click', function(e){
+    e.preventDefault();
+    $(this).hide();
+    $('#btnUpdateUser').show(300);
+    //enable all fields
+    $('#firstname').prop('disabled', false);
+    $('#lastname').prop('disabled', false);
+    $('#password').prop('disabled', false);
+    $('#password2').prop('disabled', false);
+});
+//Update User details
+$('#btnUpdateUser').on('click', function(e){
+  e.preventDefault();
+
+  var id = $('#id').val();
+  var firstname = $('#firstname').val();
+  var lastname = $('#lastname').val();
+  var position = $('#position').val();
+  var project = $('#project').val();
+  var date_hire = $('#date-hire').val();
+  var email = $('#email').val();
+  var dept = $('#dept').val();
+  var username = $('#username').val();
+  var password = $('#password').val();
+  var access = $('#access').val();
+  var role = $('#role').val();
+  var myData = 'id=' + id + '&firstname=' + firstname + '&lastname=' + lastname + '&position=' + position + '&project=' + project + '&date_hire=' + date_hire + '&username=' + username + '&password=' + password + '&email=' + email + '&dept=' + dept + '&access=' + access + '&role=' + role;
+
+  if(firstname != '' && lastname != '')
+  {
+    $.ajax({
+      type: 'POST',
+      url: '../../controls/update_user.php',
+      data: myData,
+      beforeSend: function()
+      {
+        showToast();
+      },
+      success: function(response)
+      {
+        if(response > 0)
+        {
+          $('#notificationModal').modal({backdrop: 'static', keyboard: false});
+          $('#notificationModal').modal('show');
+        }
+        else
+        {
+          toastr.error('ERROR! Update Failed. Please contact the system Administrator at local 124.');
+        }
+      }
+    })
+  }
+  else
+  {
+    toastr.error('ERROR! Please fill out all the data needed.');
+  }
+})
+//auto generate username
+$('#firstname').blur(function(e){
+  e.preventDefault();
+  var str = $('#firstname').val();
+  var fname = str.replace(/\s/g,'');
+  var f = fname.toLowerCase();
+  var str1 = $('#lastname').val();
+  var lname = str1.replace(/\s/g,'');
+  var l = lname.toLowerCase();
+  var username = f.concat('.').concat(l);
+  $('#username').val(username);
+})
+
+$('#lastname').blur(function(e){
+  e.preventDefault();
+  var str = $('#firstname').val();
+  var fname = str.replace(/\s/g,'');
+  var f = fname.toLowerCase();
+  var str1 = $('#lastname').val();
+  var lname = str1.replace(/\s/g,'');
+  var l = lname.toLowerCase();
+  var username = f.concat('.').concat(l);
+  $('#username').val(username);
+})
+//logout
+function logout()
+{
+  showToast();
+  location.href = '../../controls/logout.php';
+}
+</script>
